@@ -25,7 +25,7 @@ app.get('/api', (req, res) => {
   res.send('Hi, This is Jambaram.xyz\'s NODE API SERVER');
 })
 
-app.get('/api/summoners', async (req, res) => {
+app.get('/api/summoner/find', async (req, res) => {
   var gamename = req.query.name;
   var tagline = req.query.tag;
   
@@ -41,8 +41,9 @@ app.get('/api/summoners', async (req, res) => {
       AND tagline = $2
     `;
     var result = await client.query(query, [gamename, tagline]);
-
-    if (result.rows.length == 0)
+    var matchdetail = null;
+    
+    if (result.rows.length == 0) //DB에 없음
     {
       try {
         var summonerResponse = await axios.get(`https://asia.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gamename}/${tagline}?api_key=${riotapikey}`);
@@ -74,19 +75,30 @@ app.get('/api/summoners', async (req, res) => {
       }
       result = await client.query(query, [gamename, tagline]);
     }
-    res.json(result.rows[0]);
-  } 
+    else if (result.rows[0].revisiondate != null) { //DB에 소환사 정보가 있고, 전적갱신을 누른적이 있는사람
+      //매치데이터도 띄워야대요 시팔!!!
+      //match에서 name+tag가 일치하는 모든 매치데이터 갖고오기
+      //const find_id_from_match_query = 'SELECT * FROM match WHERE '
+      //matchdetail = 'yes it is'
+    }
+    res.json({summoner: result.rows[0], matchdetail: matchdetail});
+  }
   catch (error) {
     console.error('Error executing query', error.stack);
     res.status(500).send('Error checking database');
   }
 });
-//#2
-//match 테이블의 participant에 name+tag형식으로 조회해서 db에 있는 모든 매치데이터 띄우기, match_detail 테이블 이용
-//#2가 끝나면 일단 DB에 존재하는 모든 매치데이터가 뜸, 전적갱신 버튼 전의 모든 세팅 완료
 
+app.get('/api/summoner/update', async (req, res) => {
+  var gamename = req.query.name;
+  var tagline = req.query.tag;
+
+  if (!gamename || !tagline) {
+    return res.status(400).send('name n tag query parameter is required');
+  }
 //#3, 전적갱신 버튼 누르면
-//일단 revisiondate 갱신, riotapi로 puuid 조회, 최근 칼바람 10판을 조회. 각 경기가 match테이블의 id에 있는지 for문으로 검색. 
+//일단 revisiondate 갱신, riotapi로 puuid 조회, 최근 칼바람 20판을 조회. 각 경기가 match테이블의 id에 있는지 for문으로 검색. 
 //Case 1. DB에 있으면 그걸로 띄우기
 //Case 2. 없으면 riotapi에 요청, 
 //
+})
