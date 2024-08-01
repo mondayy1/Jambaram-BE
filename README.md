@@ -1,13 +1,11 @@
-TODO: 로고
-
 # :sparkles: Jambaram-BE
 > ARAM(칼바람) champion combination recommendation system TODO: [Demo](http://jambaram.xyz)
 
 #### Architecture
+![structure](https://github.com/user-attachments/assets/edcc1879-e389-49c2-8f1f-83345f03a893)
 
-TODO: 아키텍쳐 그림
 
-#### DB Diagram
+# :camel: DB Diagram
 
 TODO: DB Diagram
 
